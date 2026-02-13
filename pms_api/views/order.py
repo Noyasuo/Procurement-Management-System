@@ -25,8 +25,25 @@ class OrderRefundDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 @extend_schema(tags=["Order"])
 class OrderListCreateView(generics.ListCreateAPIView):
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            return Order.objects.all().order_by('-request_date')
+            
+        elif user.user_type == 'municipal_admin':
+            # Municipal Admin sees all requests to give final approval
+            return Order.objects.filter(status='approved').order_by('-request_date')
+            
+        elif user.user_type == 'procurement_admin':
+            # Procurement Admin sees all requests to filter/approve first
+            return Order.objects.all().order_by('-request_date')
+            
+        else:
+            # Regular users see their own requests
+            return Order.objects.filter(user=user).order_by('-request_date')
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()

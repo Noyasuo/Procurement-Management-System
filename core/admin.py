@@ -9,6 +9,25 @@ class AccountAdmin(UserAdmin):
     list_display = ('username', 'email', 'user_type', 'mobile_number', 'contact_number', 'is_active', 'is_staff')
     search_fields = ('username', 'email', 'user_type')
     list_filter = ('user_type', 'is_active', 'is_staff')
+    
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'mobile_number', 'contact_number')}),
+        ('Account Type', {'fields': ('user_type', 'position')}),
+        ('Additional Info', {'fields': ('id_number', 'address', 'business_permit')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+    
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2', 'email'),
+        }),
+        ('Account Type', {'fields': ('user_type', 'position')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name', 'mobile_number', 'contact_number')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+    )
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')

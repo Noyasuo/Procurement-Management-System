@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-#knf_$%mag5b&02d+-c*u)w2zi(d&eks48n*1gblqb49a5gkg-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2','192.168.1.7']
 
 
 # Application definition
@@ -44,12 +44,14 @@ INSTALLED_APPS = [
     
 
     # third-part apps
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_spectacular'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -159,22 +161,7 @@ SPECTACULAR_SETTINGS = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CORS settings
-CORS_ORIGIN_ALLOW_ALL = True  # Allow all origins during development
-CORS_ALLOW_CREDENTIALS = True
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://52.62.183.28',
-)
-
-SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-
-CSRF_TRUSTED_ORIGINS = [
-    'http://52.62.183.28',
-    'https://52.62.183.28', 
-]
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
@@ -187,14 +174,32 @@ else:
     
 
 # CORS Settings
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = tuple(
-    os.getenv('CORS_ORIGIN_WHITELIST', 
-    'http://localhost:3000,http://127.0.0.1:3000,http://52.62.183.28').split(',')
-)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://52.62.183.28",
+    "https://52.62.183.28",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://10.0.2.2:8000",
+]
+
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS',
-    'http://52.62.183.28,https://52.62.183.28').split(',')
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://52.62.183.28",
+    "https://52.62.183.28",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://10.0.2.2:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
