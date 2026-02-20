@@ -30,11 +30,21 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
 class AccountDetailsSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Account
         fields = "__all__"
+        read_only_fields = ['id', 'date_joined', 'last_login', 'is_superuser', 'is_staff', 'is_active']
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
 
 
 class OrderSerializer(serializers.ModelSerializer):

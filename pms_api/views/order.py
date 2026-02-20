@@ -34,8 +34,9 @@ class OrderListCreateView(generics.ListCreateAPIView):
             return Order.objects.all().order_by('-request_date')
             
         elif user.user_type == 'municipal_admin':
-            # Municipal Admin sees all requests to give final approval
-            return Order.objects.filter(status='approved').order_by('-request_date')
+            # Municipal Admin sees orders reviewed by Procurement (status='reviewed')
+            # These are awaiting final approval (final_status is still pending)
+            return Order.objects.filter(status='reviewed').order_by('-request_date')
             
         elif user.user_type == 'procurement_admin':
             # Procurement Admin sees all requests to filter/approve first
@@ -110,6 +111,8 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
         last_update_by = request.user
 
         if order_status is not None:
+            if request.user.user_type == 'procurement_admin' and order_status == 'approved':
+                order_status = 'reviewed'
             order.status = order_status
 
         if final_status is not None:

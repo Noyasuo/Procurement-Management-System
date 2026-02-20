@@ -44,15 +44,62 @@ class ProductAdmin(admin.ModelAdmin):
     image_tag.short_description = 'Image'
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'quantity', 'status', 'final_status', 'request_date', 'get_products')
+    list_display = ('id', 'user', 'quantity', 'status_display', 'final_status', 'request_date', 'get_products')
     
     def get_products(self, obj):
         return ", ".join([product.title for product in obj.product.all()]) 
-    get_products.short_description = 'Products'  
+    get_products.short_description = 'Products'
+    
+    def status_display(self, obj):
+        """Display status in a user-friendly way"""
+        if obj.status == 'reviewed':
+            return 'Awaiting Municipal Approval'
+        elif obj.status == 'pending':
+            return 'Pending Procurement Review'
+        elif obj.status == 'approved':
+            return 'Approved'
+        elif obj.status == 'rejected':
+            return 'Rejected'
+        else:
+            return obj.get_status_display()
+    status_display.short_description = 'Procurement Status'
 
     list_filter = ('status', 'request_date')
     search_fields = ('user__username', 'product__title')
     ordering = ('-request_date',)
+    
+    def get_queryset(self, request):
+        """Filter queryset based on user role"""
+        qs = super().get_queryset(request)
+        
+        # Municipal Admin only sees orders with status='reviewed' (awaiting their approval)
+        if hasattr(request, 'user') and request.user.user_type == 'municipal_admin':
+            qs = qs.filter(status='reviewed')
+        
+        return qs
+    
+    def approve_order(self, request, queryset):
+        """Action to approve an order"""
+        updated = queryset.update(final_status='approved')
+        self.message_user(request, f'{updated} order(s) approved successfully.')
+    approve_order.short_description = "Approve selected orders"
+    
+    def decline_order(self, request, queryset):
+        """Action to decline an order"""
+        updated = queryset.update(final_status='rejected')
+        self.message_user(request, f'{updated} order(s) declined successfully.')
+    decline_order.short_description = "Decline selected orders"
+    
+    def get_actions(self, request):
+        """Show approve/decline actions only for Municipal Admin viewing reviewed orders"""
+        actions = super().get_actions(request)
+        
+        # Only Municipal Admin sees the approve/decline actions
+        if hasattr(request, 'user') and request.user.user_type == 'municipal_admin':
+            actions['approve_order'] = self.approve_order
+            actions['decline_order'] = self.decline_order
+        
+        return actions
 
 class OrderRefundAdmin(admin.ModelAdmin):
     list_display = ('user', 'order', 'refund_amount', 'status', 'request_date', 'approval_date')

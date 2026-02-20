@@ -20,6 +20,7 @@ USER_POSITION = [
 ORDER_STATUS_CHOICES = [
     ('pending', 'Pending'),
     ('approved', 'Approved'),
+    ('reviewed', 'Reviewed'),
     ('rejected', 'Rejected'),
     ('dispatch','Dispatch'),
 ]
@@ -78,7 +79,7 @@ class Order(models.Model):
     product = models.ManyToManyField(Product)  
     quantity = models.PositiveIntegerField()  
     request_date = models.DateTimeField(auto_now_add=True)  
-    status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='approved')
+    status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     final_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     approval_date = models.DateTimeField(blank=True, null=True)  
     comments = models.TextField(blank=True, null=True) 
