@@ -1,5 +1,20 @@
 # Procurment Management System
 
+## About This Project
+A comprehensive mobile procurement management system that digitizes the entire procurement workflow. Features include vendor management, purchase order creation, approval workflows, inventory tracking, budget monitoring, and reporting analytics. Designed for seamless mobile experience with offline capabilities.
+
+## Platforms
+- **User:** Mobile App
+- **Admin:** Web and Desktop
+
+## Tech Stack
+- **Backend:** Python, Django
+- **API:** Django REST Framework
+- **Authentication:** SimpleJWT (JSON Web Tokens)
+- **Documentation:** DRF Spectacular (OpenAPI/Swagger)
+- **Database:** SQLite (default for development)
+- **Utilities:** Python-dotenv, Pillow
+
 ## Getting Started
 
 ### Development Installation
