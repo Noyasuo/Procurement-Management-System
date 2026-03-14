@@ -16,7 +16,8 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['name', 'description']
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(required=False)  
+    category = CategorySerializer(required=False)
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = Product

@@ -1,6 +1,8 @@
 from rest_framework import generics, status
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
+from rest_framework import permissions
+
 
 from pms_api.serializer import ProductSerializer, CategorySerializer
 from core.models import Product, Category
@@ -32,6 +34,22 @@ class ProductListCreateView(generics.ListCreateAPIView):
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+@extend_schema(tags=["Product"])
+class MyProductsView(generics.ListAPIView):
+    """
+    Returns a list of products for the currently authenticated supplier.
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the products
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        return Product.objects.filter(user=user)
 
 @extend_schema(tags=["Category"])
 class CategoryListCreateView(generics.ListCreateAPIView):
