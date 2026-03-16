@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-#knf_$%mag5b&02d+-c*u)w2zi(d&eks48n*1gblqb49a5gkg-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '192.168.1.7', '192.168.1.9']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '192.168.1.9']
 
 
 # Application definition
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles',   
     # app
     'pms_api',
     'core',

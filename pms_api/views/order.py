@@ -1,12 +1,15 @@
-from rest_framework import generics, serializers, status
-from rest_framework import status as res_status
+from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
-from django.utils import timezone
+from rest_framework.views import APIView
+from django.db.models import Q
 from django.core.mail import send_mail
+from django.utils import timezone
 
-from pms_api.serializer import OrderRefundSerializer, OrderSerializer
-from core.models import OrderRefund, Order, Product, Account
+from pms_api.serializer import OrderSerializer, OrderRefundSerializer
+from core.models import Order, OrderRefund, Product, Account
+
 
 @extend_schema(tags=["Order Refund"])
 class OrderRefundListCreateView(generics.ListCreateAPIView):
@@ -26,6 +29,7 @@ class OrderRefundDetailView(generics.RetrieveUpdateDestroyAPIView):
 @extend_schema(tags=["Order"])
 class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -95,6 +99,30 @@ class OrderListCreateView(generics.ListCreateAPIView):
         # Serialize and return the created order
         serializer = self.get_serializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=["Order"])
+class SupplierOrdersView(generics.ListAPIView):
+    """
+    Returns a list of orders for the currently authenticated supplier
+    that have been approved by the municipal admin.
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        This view returns a list of all approved orders containing products
+        for the currently authenticated supplier.
+        """
+        user = self.request.user
+        # Filter orders where the current user owns the products
+        # Check for 'approved' status (case-insensitive) in either status or final_status fields
+        return Order.objects.filter(
+            product__user=user
+        ).filter(
+            Q(status__iexact='approved') | Q(final_status__iexact='approved')
+        ).distinct()
 
 
 @extend_schema(tags=["Order"])
